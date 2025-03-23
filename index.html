@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Asignación de Aseos</title>
-    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <style>
         /* Estilos generales */
         body {
@@ -88,29 +87,43 @@
         .no-hecho { background: #dc3545; color: white; }
         .guardar-btn { background: #007bff; color: white; }
         .borrar-btn { background: #dc3545; color: white; }
+        .estadisticas-btn { background: #6610f2; color: white; }
 
-        .guardar-btn:hover, .hecho:hover, .no-hecho:hover, .borrar-btn:hover {
+        .guardar-btn:hover, .hecho:hover, .no-hecho:hover, .borrar-btn:hover, .estadisticas-btn:hover {
             opacity: 0.8;
             transform: scale(1.05);
         }
 
         /* Historial */
-        .historial-container {
+        .historial-container, .estadisticas-container {
             position: fixed;
             top: 0;
-            right: -300px;
             width: 300px;
             height: 100%;
             background: rgba(0, 0, 0, 0.8);
             padding: 20px;
             overflow-y: auto;
-            transition: right 0.3s ease;
+            transition: 0.3s ease;
             box-shadow: -2px 0 10px rgba(0, 0, 0, 0.5);
+            z-index: 10;
+        }
+
+        .historial-container {
+            right: -300px;
             border-left: 2px solid #007bff;
+        }
+
+        .estadisticas-container {
+            left: -300px;
+            border-right: 2px solid #6610f2;
         }
 
         .mostrar-historial {
             right: 0 !important;
+        }
+
+        .mostrar-estadisticas {
+            left: 0 !important;
         }
 
         .entrada-historial {
@@ -131,20 +144,34 @@
             transition: opacity 0.5s ease;
         }
 
-        .historial-btn {
+        .historial-btn, .estadisticas-btn {
             position: fixed;
             top: 10px;
-            right: 10px;
-            background: #6c757d;
-            color: white;
             padding: 10px 15px;
             border-radius: 5px;
             transition: background 0.3s, transform 0.2s;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
         }
 
+        .historial-btn {
+            right: 10px;
+            background: #6c757d;
+            color: white;
+        }
+
+        .estadisticas-btn {
+            left: 10px;
+            background: #6610f2;
+            color: white;
+        }
+
         .historial-btn:hover {
             background: #5a6268;
+            transform: scale(1.05);
+        }
+
+        .estadisticas-btn:hover {
+            background: #520dc2;
             transform: scale(1.05);
         }
 
@@ -226,6 +253,50 @@
         .search-btn:hover {
             background: #0056b3;
         }
+
+        /* Estilos para estadísticas */
+        .stats-person {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .stats-title {
+            font-size: 18px;
+            color: #6610f2;
+            margin-bottom: 10px;
+        }
+
+        .stat-bar-container {
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin: 5px 0;
+            overflow: hidden;
+        }
+
+        .stat-bar {
+            height: 20px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            transition: width 1s ease-in-out;
+        }
+
+        .stat-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .completado { background-color: #28a745; }
+        .no-completado { background-color: #dc3545; }
+        .pendiente { background-color: #ffc107; color: #333; }
     </style>
 </head>
 <body>
@@ -240,6 +311,7 @@
         <button class="guardar-btn" onclick="guardarAsignaciones()">Guardar Cambios</button>
 
         <button class="historial-btn" onclick="toggleHistorial()">📜 Historial</button>
+        <button class="estadisticas-btn" onclick="toggleEstadisticas()">📊 Estadísticas</button>
     </div>
 
     <div class="historial-container" id="historial">
@@ -252,7 +324,77 @@
         <button class="borrar-btn" onclick="borrarHistorial()">🗑️ Borrar Todo</button>
     </div>
 
+    <div class="estadisticas-container" id="estadisticas">
+        <h3>Estadísticas</h3>
+        <div id="stats-contenido"></div>
+    </div>
+
+    <!-- Cargar la librería Particles.js al principio -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    
     <script>
+        // Inicializar Particles.js inmediatamente cuando el DOM esté cargado
+        document.addEventListener('DOMContentLoaded', function() {
+            // Configuración de partículas
+            particlesJS("particles-js", {
+                particles: {
+                    number: { value: 100, density: { enable: true, value_area: 800 } },
+                    color: { value: "#007bff" },
+                    shape: {
+                        type: "circle",
+                        stroke: { width: 0, color: "#000000" },
+                        polygon: { nb_sides: 5 }
+                    },
+                    opacity: {
+                        value: 0.5,
+                        random: false,
+                        anim: { enable: false, speed: 1, opacity_min: 0.1, sync: false }
+                    },
+                    size: {
+                        value: 5,
+                        random: true,
+                        anim: { enable: false, speed: 40, size_min: 0.1, sync: false }
+                    },
+                    line_linked: {
+                        enable: true,
+                        distance: 150,
+                        color: "#007bff",
+                        opacity: 0.4,
+                        width: 1
+                    },
+                    move: {
+                        enable: true,
+                        speed: 6,
+                        direction: "none",
+                        random: false,
+                        straight: false,
+                        out_mode: "out",
+                        bounce: false,
+                        attract: { enable: false, rotateX: 600, rotateY: 1200 }
+                    }
+                },
+                interactivity: {
+                    detect_on: "canvas",
+                    events: {
+                        onhover: { enable: true, mode: "grab" }, 
+                        onclick: { enable: true, mode: "push" },
+                        resize: true
+                    },
+                    modes: {
+                        grab: { 
+                            distance: 140, 
+                            line_linked: { opacity: 1 } 
+                        },
+                        bubble: { distance: 400, size: 40, duration: 2, opacity: 8, speed: 3 },
+                        repulse: { distance: 200, duration: 0.4 },
+                        push: { particles_nb: 4 },
+                        remove: { particles_nb: 2 }
+                    }
+                },
+                retina_detect: true
+            });
+        });
+
         const hermanos = ["Alvi", "Ali", "Alfonso"];
         const tareas = ["Barrer y trapear sala", "Limpiar baño", "Limpiar terraza"];
 
@@ -295,6 +437,18 @@
             localStorage.setItem("historial", JSON.stringify(historial));
 
             cargarHistorial();
+            calcularEstadisticas();
+            
+            // Mostrar mensaje de confirmación
+            const mensaje = document.createElement("div");
+            mensaje.classList.add("mensaje");
+            mensaje.textContent = "¡Cambios guardados correctamente!";
+            document.querySelector(".container").appendChild(mensaje);
+            
+            // Eliminar mensaje después de 3 segundos
+            setTimeout(() => {
+                mensaje.remove();
+            }, 3000);
         }
 
         function cargarHistorial() {
@@ -333,6 +487,7 @@
                     historial.splice(index, 1); // Elimina la entrada específica
                     localStorage.setItem("historial", JSON.stringify(historial));
                     cargarHistorial(); // Recarga el historial
+                    calcularEstadisticas(); // Actualiza las estadísticas
                 }, 500); // Espera 500ms antes de eliminar
             }
         }
@@ -340,71 +495,224 @@
         function borrarHistorial() {
             localStorage.removeItem("historial");
             cargarHistorial();
+            calcularEstadisticas(); // Actualiza las estadísticas
         }
 
         function toggleHistorial() {
             document.getElementById("historial").classList.toggle("mostrar-historial");
+            // Cerrar estadísticas si están abiertas
+            document.getElementById("estadisticas").classList.remove("mostrar-estadisticas");
         }
 
-        cargarAsignaciones();
-        cargarHistorial();
+        function toggleEstadisticas() {
+            document.getElementById("estadisticas").classList.toggle("mostrar-estadisticas");
+            // Cerrar historial si está abierto
+            document.getElementById("historial").classList.remove("mostrar-historial");
+            // Calcular estadísticas
+            calcularEstadisticas();
+        }
 
-        // Configuración de partículas
-        particlesJS("particles-js", {
-            particles: {
-                number: { value: 80 },
-                color: "#007bff", // Color azul
-                shape: {
-                    type: "circle",
-                    stroke: { width: 0, color: "#000" },
-                    polygon: { nb_sides: 5 },
-                    image: { src: "img/github.svg", width: 100, height: 100 }
-                },
-                opacity: {
-                    value: 0.5,
-                    random: false,
-                    anim: { enable: false, speed: 1, opacity_min: 0.1, sync: false }
-                },
-                size: {
-                    value: 5,
-                    random: true,
-                    anim: { enable: false, speed: 40, size_min: 0.1, sync: false }
-                },
-                line_linked: {
-                    enable: true,
-                    distance: 150,
-                    color: "#007bff", // Color azul
-                    opacity: 0.4,
-                    width: 1
-                },
-                move: {
-                    enable: true,
-                    speed: 6,
-                    direction: "none",
-                    random: false,
-                    straight: false,
-                    out_mode: "out",
-                    bounce: false,
-                    attract: { enable: false, rotateX: 600, rotateY: 1200 }
-                }
-            },
-            interactivity: {
-                    detect_on: "canvas",
-                    events: {
-                        onhover: { enable: true, mode: "repulse" },
-                        onclick: { enable: true, mode: "push" },
-                        onresize: { enable: true, density_auto: true, delay: 1 }
-                    },
-                    modes: {
-                        grab: { distance: 400, line_linked: { opacity: 1 } },
-                        bubble: { distance: 400, size: 40, duration: 2, opacity: 8, speed: 3 },
-                        repulse: { distance: 200, duration: 0.4 },
-                        push: { particles_nb: 4 },
-                        remove: { particles_nb: 2 }
-                    }
-                },
-                retina_detect: true
+        function calcularEstadisticas() {
+            let historial = JSON.parse(localStorage.getItem("historial")) || [];
+            let estadisticas = {};
+            
+            // Inicializar estadísticas para cada hermano
+            hermanos.forEach(nombre => {
+                estadisticas[nombre] = {
+                    total: 0,
+                    completadas: 0,
+                    noCompletadas: 0,
+                    porTarea: {}
+                };
+                
+                // Inicializar contadores por tarea
+                tareas.forEach(tarea => {
+                    estadisticas[nombre].porTarea[tarea] = {
+                        total: 0,
+                        completadas: 0,
+                        noCompletadas: 0
+                    };
+                });
             });
-        </script>
-    </body>
+            
+            // Procesar historial
+            historial.forEach(entrada => {
+                entrada.asignaciones.forEach(asignacion => {
+                    const { nombre, tarea, estado } = asignacion;
+                    
+                    if (estado !== "") { // Solo contar si tiene estado
+                        estadisticas[nombre].total++;
+                        estadisticas[nombre].porTarea[tarea].total++;
+                        
+                        if (estado === "✔️") {
+                            estadisticas[nombre].completadas++;
+                            estadisticas[nombre].porTarea[tarea].completadas++;
+                        } else if (estado === "❌") {
+                            estadisticas[nombre].noCompletadas++;
+                            estadisticas[nombre].porTarea[tarea].noCompletadas++;
+                        }
+                    }
+                });
+            });
+            
+            // Mostrar estadísticas
+            mostrarEstadisticas(estadisticas);
+        }
+
+        function mostrarEstadisticas(estadisticas) {
+            let contenido = "";
+            
+            hermanos.forEach(nombre => {
+                const stats = estadisticas[nombre];
+                const totalTareas = stats.total;
+                const porcentajeCompletadas = totalTareas > 0 ? (stats.completadas / totalTareas * 100).toFixed(1) : 0;
+                const porcentajeNoCompletadas = totalTareas > 0 ? (stats.noCompletadas / totalTareas * 100).toFixed(1) : 0;
+                
+                contenido += `
+                <div class="stats-person">
+                    <div class="stats-title">${nombre}</div>
+                    
+                    <div class="stat-label">
+                        <span>Tareas completadas:</span>
+                        <span>${stats.completadas} de ${totalTareas} (${porcentajeCompletadas}%)</span>
+                    </div>
+                    <div class="stat-bar-container">
+                        <div class="stat-bar completado" style="width: ${porcentajeCompletadas}%">
+                            ${porcentajeCompletadas > 10 ? `${porcentajeCompletadas}%` : ''}
+                        </div>
+                    </div>
+                    
+                    <div class="stat-label">
+                        <span>Tareas no completadas:</span>
+                        <span>${stats.noCompletadas} de ${totalTareas} (${porcentajeNoCompletadas}%)</span>
+                    </div>
+                    <div class="stat-bar-container">
+                        <div class="stat-bar no-completado" style="width: ${porcentajeNoCompletadas}%">
+                            ${porcentajeNoCompletadas > 10 ? `${porcentajeNoCompletadas}%` : ''}
+                        </div>
+                    </div>
+                    
+                    <h4>Rendimiento por tarea:</h4>
+                `;
+                
+                // Estadísticas por tarea
+                tareas.forEach(tarea => {
+                    const tareastats = stats.porTarea[tarea];
+                    const totalPorTarea = tareastats.total;
+                    const porcentajeCompletadasPorTarea = totalPorTarea > 0 ? (tareastats.completadas / totalPorTarea * 100).toFixed(1) : 0;
+                    
+                    contenido += `
+                    <div>
+                        <div class="stat-label">
+                            <span>${tarea}:</span>
+                            <span>${tareastats.completadas} de ${totalPorTarea} (${porcentajeCompletadasPorTarea}%)</span>
+                        </div>
+                        <div class="stat-bar-container">
+                            <div class="stat-bar completado" style="width: ${porcentajeCompletadasPorTarea}%">
+                                ${porcentajeCompletadasPorTarea > 10 ? `${porcentajeCompletadasPorTarea}%` : ''}
+                            </div>
+                        </div>
+                    </div>
+                    `;
+                });
+                
+                contenido += `</div>`;
+            });
+            
+            // Añadir estadísticas generales
+            contenido += `
+            <div class="stats-person">
+                <div class="stats-title">Estadísticas Generales</div>
+                <div id="estadisticas-generales"></div>
+            </div>
+            `;
+            
+            document.getElementById("stats-contenido").innerHTML = contenido;
+            
+            // Calcular y mostrar estadísticas generales
+            calcularEstadisticasGenerales();
+        }
+
+        function calcularEstadisticasGenerales() {
+            let historial = JSON.parse(localStorage.getItem("historial")) || [];
+            let tareasMasFrecuentes = {};
+            let hermanosMasEficientes = {};
+            
+            // Inicializar contadores
+            tareas.forEach(tarea => {
+                tareasMasFrecuentes[tarea] = 0;
+            });
+            
+            hermanos.forEach(nombre => {
+                hermanosMasEficientes[nombre] = {
+                    completadas: 0,
+                    total: 0
+                };
+            });
+            
+            // Contar asignaciones
+            historial.forEach(entrada => {
+                entrada.asignaciones.forEach(asignacion => {
+                    const { nombre, tarea, estado } = asignacion;
+                    
+                    tareasMasFrecuentes[tarea]++;
+                    
+                    if (estado !== "") {
+                        hermanosMasEficientes[nombre].total++;
+                        if (estado === "✔️") {
+                            hermanosMasEficientes[nombre].completadas++;
+                        }
+                    }
+                });
+            });
+            
+            // Encontrar la tarea más frecuente
+            let tareaMasFrecuente = "";
+            let maxFrecuencia = 0;
+            
+            for (const tarea in tareasMasFrecuentes) {
+                if (tareasMasFrecuentes[tarea] > maxFrecuencia) {
+                    maxFrecuencia = tareasMasFrecuentes[tarea];
+                    tareaMasFrecuente = tarea;
+                }
+            }
+            
+            // Encontrar el hermano más eficiente
+            let hermanoMasEficiente = "";
+            let maxEficiencia = 0;
+            
+            for (const nombre in hermanosMasEficientes) {
+                const { completadas, total } = hermanosMasEficientes[nombre];
+                const eficiencia = total > 0 ? (completadas / total) : 0;
+                
+                if (eficiencia > maxEficiencia) {
+                    maxEficiencia = eficiencia;
+                    hermanoMasEficiente = nombre;
+                }
+            }
+            
+            // Mostrar estadísticas generales
+            let contenidoGeneral = `
+                <p>Total de asignaciones registradas: ${historial.length * hermanos.length}</p>
+                <p>Tarea más frecuente: ${tareaMasFrecuente} (${maxFrecuencia} veces)</p>
+            `;
+            
+            if (hermanoMasEficiente && maxEficiencia > 0) {
+                const porcentaje = (maxEficiencia * 100).toFixed(1);
+                contenidoGeneral += `
+                    <p>Persona más eficiente: ${hermanoMasEficiente} (${porcentaje}% completado)</p>
+                `;
+            }
+            
+            document.getElementById("estadisticas-generales").innerHTML = contenidoGeneral;
+        }
+
+        // Cargar datos al iniciar
+        window.addEventListener('load', function() {
+            cargarAsignaciones();
+            cargarHistorial();
+            calcularEstadisticas();
+        });
+    </script>
+</body>
 </html>
