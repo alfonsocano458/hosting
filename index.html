@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asignación de Aseos</title>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <style>
+        /* Estilos generales */
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            background-color: #222;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Contenedor principal */
+        .container {
+            position: relative;
+            z-index: 1;
+            padding: 20px;
+            max-width: 800px;
+            margin: auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Fondo de partículas */
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        /* Estilo de las tareas */
+        .tarea {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            margin: 10px auto;
+            width: 90%;
+            border-radius: 5px;
+            transition: background 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .tarea:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        select {
+            margin: 0 10px;
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            background: #fff;
+            color: #333;
+            font-size: 14px;
+            transition: border 0.3s;
+        }
+
+        select:hover {
+            border: 1px solid #007bff;
+        }
+
+        button {
+            cursor: pointer;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            margin: 2px;
+            transition: background 0.3s, transform 0.2s;
+            font-size: 14px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .hecho { background: #28a745; color: white; }
+        .no-hecho { background: #dc3545; color: white; }
+        .guardar-btn { background: #007bff; color: white; }
+        .borrar-btn { background: #dc3545; color: white; }
+
+        .guardar-btn:hover, .hecho:hover, .no-hecho:hover, .borrar-btn:hover {
+            opacity: 0.8;
+            transform: scale(1.05);
+        }
+
+        /* Historial */
+        .historial-container {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 300px;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            overflow-y: auto;
+            transition: right 0.3s ease;
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.5);
+            border-left: 2px solid #007bff;
+        }
+
+        .mostrar-historial {
+            right: 0 !important;
+        }
+
+        .entrada-historial {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            transition: background 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .entrada-historial:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .desaparecer {
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .historial-btn {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: #6c757d;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background 0.3s, transform 0.2s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .historial-btn:hover {
+            background: #5a6268;
+            transform: scale(1.05);
+        }
+
+        h2, h3 {
+            margin: 0;
+            padding: 10px 0;
+            font-weight: normal;
+        }
+
+        /* Estilo de los iconos */
+        .borrar-btn {
+            background: transparent;
+            border: none;
+            color: #dc3545;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .borrar-btn:hover {
+            color: #c82333;
+        }
+
+        /* Estilo de los mensajes */
+        .mensaje {
+            margin: 20px 0;
+            font-size: 16px;
+            color: #ffc107;
+        }
+
+        /* Estilo de los encabezados */
+        h2 {
+            font-size: 2em;
+            color: #007bff;
+        }
+
+        h3 {
+            font-size: 1.5em;
+            color: #ffc107;
+        }
+
+        /* Estilo de los contenedores de tareas */
+        .tarea-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Estilo de los botones de acción */
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        /* Estilo del campo de búsqueda */
+        .search-container {
+            margin: 20px 0;
+        }
+
+        .search-input {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            width: 80%;
+            max-width: 200px;
+            font-size: 14px;
+        }
+
+        .search-btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            background: #007bff;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .search-btn:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Contenedor de partículas -->
+    <div id="particles-js"></div>
+
+    <div class="container">
+        <h2>Asignación de Aseos</h2>
+
+        <div id="tareas" class="tarea-container"></div>
+        <button class="guardar-btn" onclick="guardarAsignaciones()">Guardar Cambios</button>
+
+        <button class="historial-btn" onclick="toggleHistorial()">📜 Historial</button>
+    </div>
+
+    <div class="historial-container" id="historial">
+        <h3>Historial</h3>
+        <div class="search-container">
+            <input type="date" id="search-date" class="search-input" placeholder="Buscar por fecha">
+            <button class="search-btn" onclick="buscarPorFecha()">Buscar</button>
+        </div>
+        <div id="historial-lista"></div>
+        <button class="borrar-btn" onclick="borrarHistorial()">🗑️ Borrar Todo</button>
+    </div>
+
+    <script>
+        const hermanos = ["Alvi", "Ali", "Alfonso"];
+        const tareas = ["Barrer y trapear sala", "Limpiar baño", "Limpiar terraza"];
+
+        function cargarAsignaciones() {
+            let asignaciones = JSON.parse(localStorage.getItem("asignaciones")) || [];
+            if (asignaciones.length === 0) {
+                asignaciones = hermanos.map((nombre, i) => ({ nombre, tarea: tareas[i], estado: "" }));
+                localStorage.setItem("asignaciones", JSON.stringify(asignaciones));
+            }
+
+            document.getElementById("tareas").innerHTML = asignaciones.map((a, i) => `
+                <div class="tarea">
+                    <span>${a.nombre}</span>
+                    <select id="tarea-${i}">
+                        ${tareas.map(t => `<option value="${t}" ${a.tarea === t ? "selected" : ""}>${t}</option>`).join("")}
+                    </select>
+                    <button class="hecho" onclick="marcarEstado(${i}, '✔️')">✔️</button>
+                    <button class="no-hecho" onclick="marcarEstado(${i}, '❌')">❌</button>
+                    <span id="estado-${i}">${a.estado}</span>
+                </div>
+            `).join("");
+        }
+
+        function marcarEstado(index, estado) {
+            document.getElementById(`estado-${index}`).textContent = estado;
+        }
+
+        function guardarAsignaciones() {
+            let asignaciones = hermanos.map((nombre, i) => ({
+                nombre,
+                tarea: document.getElementById(`tarea-${i}`).value,
+                estado: document.getElementById(`estado-${i}`).textContent
+            }));
+
+            let historial = JSON.parse(localStorage.getItem("historial")) || [];
+            // Guardar la fecha en formato ISO (YYYY-MM-DD)
+            historial.push({ fecha: new Date().toISOString().split('T')[0], asignaciones });
+
+            localStorage.setItem("asignaciones", JSON.stringify(asignaciones));
+            localStorage.setItem("historial", JSON.stringify(historial));
+
+            cargarHistorial();
+        }
+
+        function cargarHistorial() {
+            let historial = JSON.parse(localStorage.getItem("historial")) || [];
+            document.getElementById("historial-lista").innerHTML = historial.map((h, i) => `
+                <div class="entrada-historial" id="entrada-${i}">
+                    <strong>${h.fecha}</strong><br>
+                    ${h.asignaciones.map(a => `${a.nombre}: ${a.tarea} ${a.estado}`).join("<br>")}
+                    <button class="borrar-btn" onclick="borrarEntrada(${i})">🗑️</button>
+                </div>
+            `).join("");
+        }
+
+        function buscarPorFecha() {
+            const fechaBuscada = document.getElementById("search-date").value;
+            let historial = JSON.parse(localStorage.getItem("historial")) || [];
+            const resultados = historial.filter(h => h.fecha === fechaBuscada);
+
+            document.getElementById("historial-lista").innerHTML = resultados.length > 0 
+                ? resultados.map((h, i) => `
+                    <div class="entrada-historial" id="entrada-${i}">
+                        <strong>${h.fecha}</strong><br>
+                        ${h.asignaciones.map(a => `${a.nombre}: ${a.tarea} ${a.estado}`).join("<br>")}
+                        <button class="borrar-btn" onclick="borrarEntrada(${i})">🗑️</button>
+                    </div>
+                `).join("")
+                : `<div class="entrada-historial">No se encontraron registros para la fecha: ${fechaBuscada}</div>`;
+        }
+
+        function borrarEntrada(index) {
+            let entrada = document.getElementById(`entrada-${index}`);
+            if (entrada) {
+                entrada.classList.add("desaparecer"); // Animación de desaparición
+                setTimeout(() => {
+                    let historial = JSON.parse(localStorage.getItem("historial")) || [];
+                    historial.splice(index, 1); // Elimina la entrada específica
+                    localStorage.setItem("historial", JSON.stringify(historial));
+                    cargarHistorial(); // Recarga el historial
+                }, 500); // Espera 500ms antes de eliminar
+            }
+        }
+
+        function borrarHistorial() {
+            localStorage.removeItem("historial");
+            cargarHistorial();
+        }
+
+        function toggleHistorial() {
+            document.getElementById("historial").classList.toggle("mostrar-historial");
+        }
+
+        cargarAsignaciones();
+        cargarHistorial();
+
+        // Configuración de partículas
+        particlesJS("particles-js", {
+            particles: {
+                number: { value: 80 },
+                color: "#007bff", // Color azul
+                shape: {
+                    type: "circle",
+                    stroke: { width: 0, color: "#000" },
+                    polygon: { nb_sides: 5 },
+                    image: { src: "img/github.svg", width: 100, height: 100 }
+                },
+                opacity: {
+                    value: 0.5,
+                    random: false,
+                    anim: { enable: false, speed: 1, opacity_min: 0.1, sync: false }
+                },
+                size: {
+                    value: 5,
+                    random: true,
+                    anim: { enable: false, speed: 40, size_min: 0.1, sync: false }
+                },
+                line_linked: {
+                    enable: true,
+                    distance: 150,
+                    color: "#007bff", // Color azul
+                    opacity: 0.4,
+                    width: 1
+                },
+                move: {
+                    enable: true,
+                    speed: 6,
+                    direction: "none",
+                    random: false,
+                    straight: false,
+                    out_mode: "out",
+                    bounce: false,
+                    attract: { enable: false, rotateX: 600, rotateY: 1200 }
+                }
+            },
+            interactivity: {
+                    detect_on: "canvas",
+                    events: {
+                        onhover: { enable: true, mode: "repulse" },
+                        onclick: { enable: true, mode: "push" },
+                        onresize: { enable: true, density_auto: true, delay: 1 }
+                    },
+                    modes: {
+                        grab: { distance: 400, line_linked: { opacity: 1 } },
+                        bubble: { distance: 400, size: 40, duration: 2, opacity: 8, speed: 3 },
+                        repulse: { distance: 200, duration: 0.4 },
+                        push: { particles_nb: 4 },
+                        remove: { particles_nb: 2 }
+                    }
+                },
+                retina_detect: true
+            });
+        </script>
+    </body>
+</html>
