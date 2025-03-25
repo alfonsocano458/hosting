@@ -5,6 +5,81 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Asignación de Aseos</title>
     <style>
+        /* Estilos para el panel de permisos */
+        .permisos-container {
+            position: fixed;
+            top: 0;
+            right: -350px;
+            width: 350px;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            overflow-y: auto;
+            transition: 0.3s ease;
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.5);
+            z-index: 10;
+            border-left: 2px solid #ff7700;
+        }
+
+        .mostrar-permisos {
+            right: 0 !important;
+        }
+
+        .permisos-btn {
+            background: #ff7700;
+            color: white;
+        }
+
+        .permisos-btn:hover {
+            background: #e56a00;
+            transform: scale(1.05);
+        }
+
+        .usuario-permisos {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .usuario-header {
+            font-size: 18px;
+            color: #ff7700;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .permisos-lista {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .permiso-item {
+            padding: 5px;
+            transition: background 0.3s;
+            border-radius: 3px;
+        }
+
+        .permiso-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .permiso-item label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .permiso-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
         /* Estilos generales */
         body {
             font-family: 'Arial', sans-serif;
@@ -88,8 +163,9 @@
         .guardar-btn { background: #007bff; color: white; }
         .borrar-btn { background: #dc3545; color: white; }
         .estadisticas-btn { background: #6610f2; color: white; }
+        .cerrar-btn { background: #6c757d; color: white; }
 
-        .guardar-btn:hover, .hecho:hover, .no-hecho:hover, .borrar-btn:hover, .estadisticas-btn:hover {
+        .guardar-btn:hover, .hecho:hover, .no-hecho:hover, .borrar-btn:hover, .estadisticas-btn:hover, .cerrar-btn:hover {
             opacity: 0.8;
             transform: scale(1.05);
         }
@@ -175,6 +251,13 @@
             transform: scale(1.05);
         }
 
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
         h2, h3 {
             margin: 0;
             padding: 10px 0;
@@ -223,7 +306,8 @@
         .action-buttons {
             display: flex;
             justify-content: center;
-            margin-top: 10px;
+            margin-top: 20px;
+            gap: 10px;
         }
 
         /* Estilo del campo de búsqueda */
@@ -297,6 +381,117 @@
         .completado { background-color: #28a745; }
         .no-completado { background-color: #dc3545; }
         .pendiente { background-color: #ffc107; color: #333; }
+
+        /* Estilos para el formulario de login */
+        .login-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .login-form {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            width: 300px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-form h2 {
+            margin-bottom: 20px;
+        }
+
+        .login-form input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        .login-form input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .login-form button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s, transform 0.2s;
+        }
+
+        .login-form button:hover {
+            background: #0056b3;
+            transform: scale(1.05);
+        }
+
+        .error-message {
+            color: #dc3545;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        .loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.5s ease;
+}
+
+.loading-spinner {
+    text-align: center;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #007bff;
+    border-top: 5px solid transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 15px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
     </style>
 </head>
 <body>
@@ -304,18 +499,37 @@
     <!-- Contenedor de partículas -->
     <div id="particles-js"></div>
 
-    <div class="container">
+    <!-- Login Container -->
+    <div class="login-container" id="login-container">
+        <div class="login-form">
+            <h2>Acceso a Asignación de Aseos</h2>
+            <input type="text" id="username" placeholder="Usuario" required>
+            <input type="password" id="password" placeholder="Contraseña" required>
+            <button onclick="intentarLogin()">Iniciar Sesión</button>
+            <div id="login-error" class="error-message"></div>
+        </div>
+    </div>
+
+    <div class="container" id="main-container" style="display: none;">
         <h2>Asignación de Aseos</h2>
+        <div id="bienvenida"></div>
 
         <div id="tareas" class="tarea-container"></div>
-        <button class="guardar-btn" onclick="guardarAsignaciones()">Guardar Cambios</button>
+        
+        <div class="action-buttons">
+            <button class="guardar-btn" onclick="guardarAsignaciones()">Guardar Cambios</button>
+            <button class="cerrar-btn" onclick="cerrarSesion()">Cerrar Sesión</button>
+        </div>
 
         <button class="historial-btn" onclick="toggleHistorial()">📜 Historial</button>
         <button class="estadisticas-btn" onclick="toggleEstadisticas()">📊 Estadísticas</button>
     </div>
 
     <div class="historial-container" id="historial">
-        <h3>Historial</h3>
+        <div class="panel-header">
+            <h3>Historial</h3>
+            <button class="cerrar-btn" onclick="toggleHistorial()">Cerrar</button>
+        </div>
         <div class="search-container">
             <input type="date" id="search-date" class="search-input" placeholder="Buscar por fecha">
             <button class="search-btn" onclick="buscarPorFecha()">Buscar</button>
@@ -325,14 +539,37 @@
     </div>
 
     <div class="estadisticas-container" id="estadisticas">
-        <h3>Estadísticas</h3>
+        <div class="panel-header">
+            <h3>Estadísticas</h3>
+            <button class="cerrar-btn" onclick="toggleEstadisticas()">Cerrar</button>
+        </div>
         <div id="stats-contenido"></div>
     </div>
 
-    <!-- Cargar la librería Particles.js al principio -->
+    <div class="permisos-container" id="permisos-container">
+        <div class="panel-header">
+            <h3>Gestión de Permisos</h3>
+            <button class="cerrar-btn" onclick="cerrarPanelPermisos()">Cerrar</button>
+        </div>
+        <div id="permisos-lista"></div>
+    </div>
+
+    <button class="permisos-btn" onclick="mostrarPanelPermisos()">👥 Gestionar Permisos</button>
+
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     
     <script>
+        // Datos de usuarios
+        const usuarios = [
+            { username: "admin", password: "admin123", role: "admin", nombre: "Administrador" },
+            { username: "alvi", password: "alvi123", role: "user", nombre: "Alvi" },
+            { username: "ali", password: "ali123", role: "user", nombre: "Ali" },
+            { username: "alfonso", password: "alfonso123", role: "user", nombre: "Alfonso" }
+        ];
+
+        // Usuario actual
+        let usuarioActual = null;
+
         // Inicializar Particles.js inmediatamente cuando el DOM esté cargado
         document.addEventListener('DOMContentLoaded', function() {
             // Configuración de partículas
@@ -393,10 +630,114 @@
                 },
                 retina_detect: true
             });
+
+            // Verificar si hay una sesión activa
+            const sesionGuardada = localStorage.getItem("sesionActual");
+            if (sesionGuardada) {
+                usuarioActual = JSON.parse(sesionGuardada);
+                mostrarAplicacion();
+            }
         });
 
         const hermanos = ["Alvi", "Ali", "Alfonso"];
         const tareas = ["Barrer y trapear sala", "Limpiar baño", "Limpiar terraza"];
+
+        function intentarLogin() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            const errorElement = document.getElementById("login-error");
+            
+            const usuario = usuarios.find(user => 
+                user.username === username && user.password === password
+            );
+            
+            if (usuario) {
+                usuarioActual = {
+                    username: usuario.username,
+                    role: usuario.role,
+                    nombre: usuario.nombre
+                };
+                
+                // Guardar sesión en localStorage
+                localStorage.setItem("sesionActual", JSON.stringify(usuarioActual));
+                
+                // Mostrar la aplicación principal
+                mostrarAplicacion();
+            } else {
+                errorElement.textContent = "Usuario o contraseña incorrectos";
+                // Animación de error
+                errorElement.style.animation = "none";
+                setTimeout(() => {
+                    errorElement.style.animation = "shake 0.5s";
+                }, 10);
+            }
+        }
+
+        function mostrarAplicacion() {
+            // Ocultar login, mostrar aplicación
+            document.getElementById("login-container").style.display = "none";
+            document.getElementById("main-container").style.display = "block";
+            
+            // Mostrar mensaje de bienvenida
+            document.getElementById("bienvenida").innerHTML = `
+                <p>Bienvenido, ${usuarioActual.nombre}!</p>
+            `;
+            
+            // Configurar interfaz según el rol
+            configurarInterfazSegunRol();
+            
+            // Cargar datos
+            cargarAsignaciones();
+            cargarHistorial();
+            
+            // Siempre calcular estadísticas independientemente del rol
+            calcularEstadisticas();
+        }
+
+        function configurarInterfazSegunRol() {
+            // Mostrar/ocultar elementos según el rol
+            const botonesBorrar = document.querySelectorAll(".borrar-btn");
+            const botonEstadisticas = document.querySelector(".estadisticas-btn");
+            
+            if (usuarioActual.role !== "admin") {
+                // Ocultar botones de borrar para usuarios no admin
+                botonesBorrar.forEach(btn => {
+                    if (!btn.classList.contains("cerrar-btn")) {
+                        btn.style.display = "none";
+                    }
+                });
+                
+                // Ocultar botón de estadísticas para usuarios que no son admin
+                if (hermanos.includes(usuarioActual.nombre)) {
+                    botonEstadisticas.style.display = "none";
+                }
+            } else {
+                // Mostrar botones para admin
+                botonesBorrar.forEach(btn => {
+                    btn.style.display = "inline-block";
+                });
+                botonEstadisticas.style.display = "inline-block";
+            }
+        }
+
+        function cerrarSesion() {
+            // Eliminar sesión del localStorage
+            localStorage.removeItem("sesionActual");
+            usuarioActual = null;
+            
+            // Ocultar aplicación, mostrar login
+            document.getElementById("main-container").style.display = "none";
+            document.getElementById("login-container").style.display = "flex";
+            
+            // Limpiar campos
+            document.getElementById("username").value = "";
+            document.getElementById("password").value = "";
+            document.getElementById("login-error").textContent = "";
+            
+            // Cerrar paneles
+            document.getElementById("historial").classList.remove("mostrar-historial");
+            document.getElementById("estadisticas").classList.remove("mostrar-estadisticas");
+        }
 
         function cargarAsignaciones() {
             let asignaciones = JSON.parse(localStorage.getItem("asignaciones")) || [];
@@ -405,10 +746,16 @@
                 localStorage.setItem("asignaciones", JSON.stringify(asignaciones));
             }
 
-            document.getElementById("tareas").innerHTML = asignaciones.map((a, i) => `
+            // Filtrar asignaciones si el usuario no es admin
+            let asignacionesMostradas = asignaciones;
+            if (usuarioActual.role !== "admin" && hermanos.includes(usuarioActual.nombre)) {
+                asignacionesMostradas = asignaciones.filter(a => a.nombre === usuarioActual.nombre);
+            }
+
+            document.getElementById("tareas").innerHTML = asignacionesMostradas.map((a, i) => `
                 <div class="tarea">
                     <span>${a.nombre}</span>
-                    <select id="tarea-${i}">
+                    <select id="tarea-${i}" ${usuarioActual.role !== "admin" ? "disabled" : ""}>
                         ${tareas.map(t => `<option value="${t}" ${a.tarea === t ? "selected" : ""}>${t}</option>`).join("")}
                     </select>
                     <button class="hecho" onclick="marcarEstado(${i}, '✔️')">✔️</button>
@@ -423,15 +770,36 @@
         }
 
         function guardarAsignaciones() {
-            let asignaciones = hermanos.map((nombre, i) => ({
-                nombre,
-                tarea: document.getElementById(`tarea-${i}`).value,
-                estado: document.getElementById(`estado-${i}`).textContent
-            }));
+            let asignaciones = JSON.parse(localStorage.getItem("asignaciones")) || [];
+            
+            // Si el usuario no es admin, solo actualiza su propio estado
+            if (usuarioActual.role !== "admin" && hermanos.includes(usuarioActual.nombre)) {
+                const i = 0; // Solo hay una tarea mostrada para usuarios normales
+                const miIndex = asignaciones.findIndex(a => a.nombre === usuarioActual.nombre);
+                if (miIndex !== -1) {
+                    asignaciones[miIndex].estado = document.getElementById(`estado-${i}`).textContent;
+                }
+            } else {
+                // Para admin, actualiza todas las tareas
+                hermanos.forEach((nombre, i) => {
+                    const index = asignaciones.findIndex(a => a.nombre === nombre);
+                    if (index !== -1) {
+                        asignaciones[index] = {
+                            nombre,
+                            tarea: document.getElementById(`tarea-${i}`).value,
+                            estado: document.getElementById(`estado-${i}`).textContent
+                        };
+                    }
+                });
+            }
 
             let historial = JSON.parse(localStorage.getItem("historial")) || [];
             // Guardar la fecha en formato ISO (YYYY-MM-DD)
-            historial.push({ fecha: new Date().toISOString().split('T')[0], asignaciones });
+            historial.push({ 
+                fecha: new Date().toISOString().split('T')[0], 
+                asignaciones,
+                usuario: usuarioActual.nombre
+            });
 
             localStorage.setItem("asignaciones", JSON.stringify(asignaciones));
             localStorage.setItem("historial", JSON.stringify(historial));
@@ -453,11 +821,22 @@
 
         function cargarHistorial() {
             let historial = JSON.parse(localStorage.getItem("historial")) || [];
+            
+            // Filtrar historial si el usuario no es admin
+            if (usuarioActual.role !== "admin" && hermanos.includes(usuarioActual.nombre)) {
+                historial = historial.map(h => {
+                    return {
+                        ...h,
+                        asignaciones: h.asignaciones.filter(a => a.nombre === usuarioActual.nombre)
+                    };
+                });
+            }
+            
             document.getElementById("historial-lista").innerHTML = historial.map((h, i) => `
                 <div class="entrada-historial" id="entrada-${i}">
-                    <strong>${h.fecha}</strong><br>
+                    <strong>${h.fecha}</strong> ${h.usuario ? `(por ${h.usuario})` : ""}<br>
                     ${h.asignaciones.map(a => `${a.nombre}: ${a.tarea} ${a.estado}`).join("<br>")}
-                    <button class="borrar-btn" onclick="borrarEntrada(${i})">🗑️</button>
+                    ${usuarioActual.role === "admin" ? `<button class="borrar-btn" onclick="borrarEntrada(${i})">🗑️</button>` : ""}
                 </div>
             `).join("");
         }
@@ -465,20 +844,35 @@
         function buscarPorFecha() {
             const fechaBuscada = document.getElementById("search-date").value;
             let historial = JSON.parse(localStorage.getItem("historial")) || [];
-            const resultados = historial.filter(h => h.fecha === fechaBuscada);
+            
+            // Filtrar por fecha
+            let resultados = historial.filter(h => h.fecha === fechaBuscada);
+            
+            // Filtrar por usuario si no es admin
+            if (usuarioActual.role !== "admin" && hermanos.includes(usuarioActual.nombre)) {
+                resultados = resultados.map(h => {
+                    return {
+                        ...h,
+                        asignaciones: h.asignaciones.filter(a => a.nombre === usuarioActual.nombre)
+                    };
+                });
+            }
 
             document.getElementById("historial-lista").innerHTML = resultados.length > 0 
                 ? resultados.map((h, i) => `
                     <div class="entrada-historial" id="entrada-${i}">
-                        <strong>${h.fecha}</strong><br>
+                        <strong>${h.fecha}</strong> ${h.usuario ? `(por ${h.usuario})` : ""}<br>
                         ${h.asignaciones.map(a => `${a.nombre}: ${a.tarea} ${a.estado}`).join("<br>")}
-                        <button class="borrar-btn" onclick="borrarEntrada(${i})">🗑️</button>
+                        ${usuarioActual.role === "admin" ? `<button class="borrar-btn" onclick="borrarEntrada(${i})">🗑️</button>` : ""}
                     </div>
                 `).join("")
                 : `<div class="entrada-historial">No se encontraron registros para la fecha: ${fechaBuscada}</div>`;
         }
 
         function borrarEntrada(index) {
+            // Solo permitir a administradores
+            if (usuarioActual.role !== "admin") return;
+            
             let entrada = document.getElementById(`entrada-${index}`);
             if (entrada) {
                 entrada.classList.add("desaparecer"); // Animación de desaparición
@@ -493,6 +887,9 @@
         }
 
         function borrarHistorial() {
+            // Solo permitir a administradores
+            if (usuarioActual.role !== "admin") return;
+            
             localStorage.removeItem("historial");
             cargarHistorial();
             calcularEstadisticas(); // Actualiza las estadísticas
@@ -505,11 +902,23 @@
         }
 
         function toggleEstadisticas() {
+            // Verificar si el usuario tiene permiso
+            if (usuarioActual.role !== "admin") {
+                const mensaje = document.createElement("div");
+                mensaje.classList.add("mensaje");
+                mensaje.textContent = "No tienes permisos para ver estadísticas";
+                document.querySelector(".container").appendChild(mensaje);
+                setTimeout(() => mensaje.remove(), 3000);
+                return;
+            }
+            
             document.getElementById("estadisticas").classList.toggle("mostrar-estadisticas");
             // Cerrar historial si está abierto
             document.getElementById("historial").classList.remove("mostrar-historial");
-            // Calcular estadísticas
+            // Calcular y mostrar estadísticas
             calcularEstadisticas();
+            // Animar las barras
+            setTimeout(animarBarrasEstadisticas, 100);
         }
 
         function calcularEstadisticas() {
@@ -539,180 +948,407 @@
             historial.forEach(entrada => {
                 entrada.asignaciones.forEach(asignacion => {
                     const { nombre, tarea, estado } = asignacion;
-                    
-                    if (estado !== "") { // Solo contar si tiene estado
+                    if (hermanos.includes(nombre)) {
+                        // Incrementar total
                         estadisticas[nombre].total++;
-                        estadisticas[nombre].porTarea[tarea].total++;
                         
+                        // Incrementar contadores por estado
                         if (estado === "✔️") {
                             estadisticas[nombre].completadas++;
-                            estadisticas[nombre].porTarea[tarea].completadas++;
                         } else if (estado === "❌") {
-                            estadisticas[nombre].noCompletadas++;
-                            estadisticas[nombre].porTarea[tarea].noCompletadas++;
+                                                        estadisticas[nombre].noCompletadas++;
+                        }
+                        
+                        // Incrementar contadores por tarea
+                        if (tarea && estadisticas[nombre].porTarea[tarea]) {
+                            estadisticas[nombre].porTarea[tarea].total++;
+                            if (estado === "✔️") {
+                                estadisticas[nombre].porTarea[tarea].completadas++;
+                            } else if (estado === "❌") {
+                                estadisticas[nombre].porTarea[tarea].noCompletadas++;
+                            }
                         }
                     }
                 });
             });
             
-            // Mostrar estadísticas
-            mostrarEstadisticas(estadisticas);
-        }
-
-        function mostrarEstadisticas(estadisticas) {
-            let contenido = "";
+            // Generar HTML para estadísticas
+            let statsHTML = "";
             
             hermanos.forEach(nombre => {
                 const stats = estadisticas[nombre];
-                const totalTareas = stats.total;
-                const porcentajeCompletadas = totalTareas > 0 ? (stats.completadas / totalTareas * 100).toFixed(1) : 0;
-                const porcentajeNoCompletadas = totalTareas > 0 ? (stats.noCompletadas / totalTareas * 100).toFixed(1) : 0;
+                const completadasPct = stats.total > 0 ? (stats.completadas / stats.total * 100).toFixed(1) : 0;
+                const noCompletadasPct = stats.total > 0 ? (stats.noCompletadas / stats.total * 100).toFixed(1) : 0;
+                const pendientesPct = stats.total > 0 ? (100 - completadasPct - noCompletadasPct).toFixed(1) : 100;
                 
-                contenido += `
-                <div class="stats-person">
-                    <div class="stats-title">${nombre}</div>
-                    
-                    <div class="stat-label">
-                        <span>Tareas completadas:</span>
-                        <span>${stats.completadas} de ${totalTareas} (${porcentajeCompletadas}%)</span>
-                    </div>
-                    <div class="stat-bar-container">
-                        <div class="stat-bar completado" style="width: ${porcentajeCompletadas}%">
-                            ${porcentajeCompletadas > 10 ? `${porcentajeCompletadas}%` : ''}
-                        </div>
-                    </div>
-                    
-                    <div class="stat-label">
-                        <span>Tareas no completadas:</span>
-                        <span>${stats.noCompletadas} de ${totalTareas} (${porcentajeNoCompletadas}%)</span>
-                    </div>
-                    <div class="stat-bar-container">
-                        <div class="stat-bar no-completado" style="width: ${porcentajeNoCompletadas}%">
-                            ${porcentajeNoCompletadas > 10 ? `${porcentajeNoCompletadas}%` : ''}
-                        </div>
-                    </div>
-                    
-                    <h4>Rendimiento por tarea:</h4>
-                `;
-                
-                // Estadísticas por tarea
-                tareas.forEach(tarea => {
-                    const tareastats = stats.porTarea[tarea];
-                    const totalPorTarea = tareastats.total;
-                    const porcentajeCompletadasPorTarea = totalPorTarea > 0 ? (tareastats.completadas / totalPorTarea * 100).toFixed(1) : 0;
-                    
-                    contenido += `
-                    <div>
+                statsHTML += `
+                    <div class="stats-person">
+                        <div class="stats-title">${nombre}</div>
                         <div class="stat-label">
-                            <span>${tarea}:</span>
-                            <span>${tareastats.completadas} de ${totalPorTarea} (${porcentajeCompletadasPorTarea}%)</span>
+                            <span>Completadas (${stats.completadas})</span>
+                            <span>${completadasPct}%</span>
                         </div>
                         <div class="stat-bar-container">
-                            <div class="stat-bar completado" style="width: ${porcentajeCompletadasPorTarea}%">
-                                ${porcentajeCompletadasPorTarea > 10 ? `${porcentajeCompletadasPorTarea}%` : ''}
+                            <div class="stat-bar completado" style="width: ${completadasPct}%">
+                                ${completadasPct > 10 ? `${completadasPct}%` : ""}
                             </div>
                         </div>
+                        
+                        <div class="stat-label">
+                            <span>No Completadas (${stats.noCompletadas})</span>
+                            <span>${noCompletadasPct}%</span>
+                        </div>
+                        <div class="stat-bar-container">
+                            <div class="stat-bar no-completado" style="width: ${noCompletadasPct}%">
+                                ${noCompletadasPct > 10 ? `${noCompletadasPct}%` : ""}
+                            </div>
+                        </div>
+                        
+                        <div class="stat-label">
+                            <span>Pendientes (${stats.total - stats.completadas - stats.noCompletadas})</span>
+                            <span>${pendientesPct}%</span>
+                        </div>
+                        <div class="stat-bar-container">
+                            <div class="stat-bar pendiente" style="width: ${pendientesPct}%">
+                                ${pendientesPct > 10 ? `${pendientesPct}%` : ""}
+                            </div>
+                        </div>
+                        
+                        <div class="stats-title">Por Tareas</div>
+                        ${Object.entries(stats.porTarea).map(([nombreTarea, datosTarea]) => {
+                            const tareaCompletadasPct = datosTarea.total > 0 ? (datosTarea.completadas / datosTarea.total * 100).toFixed(1) : 0;
+                            const tareaNoCompletadasPct = datosTarea.total > 0 ? (datosTarea.noCompletadas / datosTarea.total * 100).toFixed(1) : 0;
+                            const tareaPendientesPct = datosTarea.total > 0 ? (100 - tareaCompletadasPct - tareaNoCompletadasPct).toFixed(1) : 100;
+                            
+                            return `
+                                <div class="tarea-stats">
+                                    <div class="stat-label">
+                                        <span>${nombreTarea} (${datosTarea.total})</span>
+                                    </div>
+                                    <div class="stat-bar-container" style="display: flex; height: 20px; margin: 5px 0;">
+                                        <div class="stat-bar completado" style="width: ${tareaCompletadasPct}%; height: 100%"></div>
+                                        <div class="stat-bar no-completado" style="width: ${tareaNoCompletadasPct}%; height: 100%"></div>
+                                        <div class="stat-bar pendiente" style="width: ${tareaPendientesPct}%; height: 100%"></div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join("")}
                     </div>
-                    `;
-                });
-                
-                contenido += `</div>`;
-            });
-            
-            // Añadir estadísticas generales
-            contenido += `
-            <div class="stats-person">
-                <div class="stats-title">Estadísticas Generales</div>
-                <div id="estadisticas-generales"></div>
-            </div>
-            `;
-            
-            document.getElementById("stats-contenido").innerHTML = contenido;
-            
-            // Calcular y mostrar estadísticas generales
-            calcularEstadisticasGenerales();
-        }
-
-        function calcularEstadisticasGenerales() {
-            let historial = JSON.parse(localStorage.getItem("historial")) || [];
-            let tareasMasFrecuentes = {};
-            let hermanosMasEficientes = {};
-            
-            // Inicializar contadores
-            tareas.forEach(tarea => {
-                tareasMasFrecuentes[tarea] = 0;
-            });
-            
-            hermanos.forEach(nombre => {
-                hermanosMasEficientes[nombre] = {
-                    completadas: 0,
-                    total: 0
-                };
-            });
-            
-            // Contar asignaciones
-            historial.forEach(entrada => {
-                entrada.asignaciones.forEach(asignacion => {
-                    const { nombre, tarea, estado } = asignacion;
-                    
-                    tareasMasFrecuentes[tarea]++;
-                    
-                    if (estado !== "") {
-                        hermanosMasEficientes[nombre].total++;
-                        if (estado === "✔️") {
-                            hermanosMasEficientes[nombre].completadas++;
-                        }
-                    }
-                });
-            });
-            
-            // Encontrar la tarea más frecuente
-            let tareaMasFrecuente = "";
-            let maxFrecuencia = 0;
-            
-            for (const tarea in tareasMasFrecuentes) {
-                if (tareasMasFrecuentes[tarea] > maxFrecuencia) {
-                    maxFrecuencia = tareasMasFrecuentes[tarea];
-                    tareaMasFrecuente = tarea;
-                }
-            }
-            
-            // Encontrar el hermano más eficiente
-            let hermanoMasEficiente = "";
-            let maxEficiencia = 0;
-            
-            for (const nombre in hermanosMasEficientes) {
-                const { completadas, total } = hermanosMasEficientes[nombre];
-                const eficiencia = total > 0 ? (completadas / total) : 0;
-                
-                if (eficiencia > maxEficiencia) {
-                    maxEficiencia = eficiencia;
-                    hermanoMasEficiente = nombre;
-                }
-            }
-            
-            // Mostrar estadísticas generales
-            let contenidoGeneral = `
-                <p>Total de asignaciones registradas: ${historial.length * hermanos.length}</p>
-                <p>Tarea más frecuente: ${tareaMasFrecuente} (${maxFrecuencia} veces)</p>
-            `;
-            
-            if (hermanoMasEficiente && maxEficiencia > 0) {
-                const porcentaje = (maxEficiencia * 100).toFixed(1);
-                contenidoGeneral += `
-                    <p>Persona más eficiente: ${hermanoMasEficiente} (${porcentaje}% completado)</p>
                 `;
-            }
+            });
             
-            document.getElementById("estadisticas-generales").innerHTML = contenidoGeneral;
+            document.getElementById("stats-contenido").innerHTML = statsHTML;
         }
 
-        // Cargar datos al iniciar
-        window.addEventListener('load', function() {
-            cargarAsignaciones();
-            cargarHistorial();
-            calcularEstadisticas();
+        function animarBarrasEstadisticas() {
+            const barras = document.querySelectorAll('.stat-bar');
+            barras.forEach(barra => {
+                const anchoOriginal = barra.style.width;
+                barra.style.width = "0%";
+                setTimeout(() => {
+                    barra.style.width = anchoOriginal;
+                }, 50);
+            });
+        }
+
+        // Agregar eventos al formulario de login para permitir envío con Enter
+        document.getElementById("username").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                document.getElementById("password").focus();
+            }
         });
+
+        document.getElementById("password").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                intentarLogin();
+            }
+        });
+
+        // Sistema de permisos mejorado
+        const PERMISOS = {
+            GUARDAR_CAMBIOS: 'guardar_cambios',
+            VER_HISTORIAL: 'ver_historial',
+            VER_ESTADISTICAS: 'ver_estadisticas',
+            BORRAR_HISTORIAL: 'borrar_historial',
+            ASIGNAR_PERMISOS: 'asignar_permisos'
+        };
+
+        // Inicializar permisos por defecto por rol
+        function inicializarPermisosPorDefecto() {
+            const permisosGuardados = localStorage.getItem("permisosUsuarios");
+            
+            if (!permisosGuardados) {
+                // Definición inicial de permisos por rol
+                const permisosRolDefault = {
+                    "admin": [
+                        PERMISOS.GUARDAR_CAMBIOS, 
+                        PERMISOS.VER_HISTORIAL, 
+                        PERMISOS.VER_ESTADISTICAS, 
+                        PERMISOS.BORRAR_HISTORIAL,
+                        PERMISOS.ASIGNAR_PERMISOS
+                    ],
+                    "user": []
+                };
+                
+                // Asignar permisos por defecto a cada usuario
+                const permisosUsuarios = {};
+                
+                usuarios.forEach(usuario => {
+                    permisosUsuarios[usuario.username] = [...permisosRolDefault[usuario.role]];
+                });
+                
+                // Guardar en localStorage
+                localStorage.setItem("permisosUsuarios", JSON.stringify(permisosUsuarios));
+                
+                return permisosUsuarios;
+            }
+            
+            return JSON.parse(permisosGuardados);
+        }
+
+        // Función para verificar si el usuario tiene un permiso específico
+        function tienePermiso(permiso) {
+            if (!usuarioActual || !usuarioActual.username) return false;
+            
+            const permisosUsuarios = JSON.parse(localStorage.getItem("permisosUsuarios")) || inicializarPermisosPorDefecto();
+            const permisosUsuarioActual = permisosUsuarios[usuarioActual.username] || [];
+            
+            return permisosUsuarioActual.includes(permiso);
+        }
+
+        // Función para otorgar o revocar un permiso a un usuario
+        function gestionarPermiso(username, permiso, otorgar = true) {
+            // Solo el admin puede gestionar permisos
+            if (!tienePermiso(PERMISOS.ASIGNAR_PERMISOS)) {
+                mostrarMensajeError("No tienes permiso para gestionar permisos");
+                return false;
+            }
+            
+            const permisosUsuarios = JSON.parse(localStorage.getItem("permisosUsuarios")) || inicializarPermisosPorDefecto();
+            
+            if (!permisosUsuarios[username]) {
+                permisosUsuarios[username] = [];
+            }
+            
+            if (otorgar) {
+                // Agregar permiso si no existe
+                if (!permisosUsuarios[username].includes(permiso)) {
+                    permisosUsuarios[username].push(permiso);
+                }
+            } else {
+                // Revocar permiso si existe
+                permisosUsuarios[username] = permisosUsuarios[username].filter(p => p !== permiso);
+            }
+            
+            // Guardar cambios
+            localStorage.setItem("permisosUsuarios", JSON.stringify(permisosUsuarios));
+            return true;
+        }
+
+        // Función para mostrar mensajes de error/éxito
+        function mostrarMensaje(mensaje, esError = false) {
+            const elementoMensaje = document.createElement("div");
+            elementoMensaje.classList.add("mensaje");
+            elementoMensaje.textContent = mensaje;
+            
+            if (esError) {
+                elementoMensaje.style.color = "#dc3545";
+            }
+            
+            document.querySelector(".container").appendChild(elementoMensaje);
+            
+            // Eliminar mensaje después de 3 segundos
+            setTimeout(() => {
+                elementoMensaje.remove();
+            }, 3000);
+        }
+
+        function mostrarMensajeError(mensaje) {
+            mostrarMensaje(mensaje, true);
+        }
+
+        function mostrarMensajeExito(mensaje) {
+            mostrarMensaje(mensaje, false);
+        }
+
+        // Función para mostrar el panel de gestión de permisos
+        function mostrarPanelPermisos() {
+            // Verificar que el usuario tiene permiso para asignar permisos
+            if (!tienePermiso(PERMISOS.ASIGNAR_PERMISOS)) {
+                mostrarMensajeError("No tienes permiso para gestionar permisos");
+                return;
+            }
+            
+            // Obtener el elemento del panel
+            const panelPermisos = document.getElementById("permisos-container");
+            
+            // Mostrar el panel
+            panelPermisos.classList.add("mostrar-permisos");
+            
+            // Cerrar otros paneles
+            document.getElementById("historial").classList.remove("mostrar-historial");
+            document.getElementById("estadisticas").classList.remove("mostrar-estadisticas");
+            
+            // Actualizar contenido del panel
+            actualizarPanelPermisos();
+        }
+
+        // Función para actualizar el contenido del panel de permisos
+        function actualizarPanelPermisos() {
+            // Obtener los permisos de todos los usuarios
+            const permisosUsuarios = JSON.parse(localStorage.getItem("permisosUsuarios")) || inicializarPermisosPorDefecto();
+            
+            // Crear el HTML para cada usuario
+            let permisosHTML = "";
+            
+            usuarios.filter(u => u.username !== "admin").forEach(usuario => {
+                const permisosDelUsuario = permisosUsuarios[usuario.username] || [];
+                
+                permisosHTML += `
+                    <div class="usuario-permisos">
+                        <div class="usuario-header">
+                            <strong>${usuario.nombre}</strong> (${usuario.username})
+                        </div>
+                        <div class="permisos-lista">
+                            ${Object.values(PERMISOS).map(permiso => {
+                                const tieneElPermiso = permisosDelUsuario.includes(permiso);
+                                return `
+                                    <div class="permiso-item">
+                                        <label>
+                                            <input type="checkbox" 
+                                                   data-usuario="${usuario.username}" 
+                                                   data-permiso="${permiso}" 
+                                                   ${tieneElPermiso ? 'checked' : ''}
+                                                   onchange="cambiarPermiso(this)">
+                                            ${traducirPermiso(permiso)}
+                                        </label>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            // Actualizar el HTML del panel
+            document.getElementById("permisos-lista").innerHTML = permisosHTML;
+        }
+
+        // Función para mostrar los permisos en español
+        function traducirPermiso(permiso) {
+            const traducciones = {
+                'guardar_cambios': 'Guardar cambios de asignaciones',
+                'ver_historial': 'Ver historial',
+                'ver_estadisticas': 'Ver estadísticas',
+                'borrar_historial': 'Borrar entradas del historial',
+                'asignar_permisos': 'Asignar permisos a otros usuarios'
+            };
+            
+            return traducciones[permiso] || permiso;
+        }
+
+        // Función para cambiar un permiso cuando se hace clic en un checkbox
+        function cambiarPermiso(checkbox) {
+            const username = checkbox.dataset.usuario;
+            const permiso = checkbox.dataset.permiso;
+            const otorgar = checkbox.checked;
+            
+            // Aplicar el cambio
+            if (gestionarPermiso(username, permiso, otorgar)) {
+                mostrarMensajeExito(`Permiso de ${traducirPermiso(permiso)} ${otorgar ? 'otorgado a' : 'revocado de'} ${username}`);
+            }
+        }
+
+        // Función para cerrar el panel de permisos
+        function cerrarPanelPermisos() {
+            document.getElementById("permisos-container").classList.remove("mostrar-permisos");
+        }
+        
+
+        // Agregar la inicialización de permisos cuando se carga la página
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar el sistema de permisos
+            inicializarPermisosPorDefecto();
+        });
+
+        // Actualizar la función configurarInterfazSegunRol
+        function configurarInterfazSegunRol() {
+            // Elementos de la interfaz
+            const botonGuardar = document.querySelector(".guardar-btn");
+            const botonHistorial = document.querySelector(".historial-btn");
+            const botonEstadisticas = document.querySelector(".estadisticas-btn");
+            const botonPermisos = document.querySelector(".permisos-btn");
+            const botonesBorrar = document.querySelectorAll(".borrar-btn:not(.cerrar-btn)");
+            
+            // Mostrar/ocultar elementos según los permisos
+            botonGuardar.style.display = tienePermiso(PERMISOS.GUARDAR_CAMBIOS) ? "inline-block" : "none";
+            botonHistorial.style.display = tienePermiso(PERMISOS.VER_HISTORIAL) ? "inline-block" : "none";
+            botonEstadisticas.style.display = tienePermiso(PERMISOS.VER_ESTADISTICAS) ? "inline-block" : "none";
+            botonPermisos.style.display = tienePermiso(PERMISOS.ASIGNAR_PERMISOS) ? "inline-block" : "none";
+            
+            // Permisos para borrar elementos del historial
+            botonesBorrar.forEach(btn => {
+                btn.style.display = tienePermiso(PERMISOS.BORRAR_HISTORIAL) ? "inline-block" : "none";
+            });
+            
+            // Deshabilitar selects para usuarios sin permiso de guardar cambios
+            const selects = document.querySelectorAll("select");
+            selects.forEach(select => {
+                select.disabled = !tienePermiso(PERMISOS.GUARDAR_CAMBIOS);
+            });
+        }
+        function intentarLogin() {
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+    const errorElement = document.getElementById("login-error");
+    const loginContainer = document.getElementById("login-container");
+
+    // Crear elemento de carga
+    const loadingOverlay = document.createElement("div");
+    loadingOverlay.classList.add("loading-overlay");
+    loadingOverlay.innerHTML = `
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Cargando...</p>
+        </div>
+    `;
+
+    const usuario = usuarios.find(user =>
+        user.username === username && user.password === password
+    );
+
+    if (usuario) {
+        // Mostrar overlay de carga
+        loginContainer.appendChild(loadingOverlay);
+
+        // Simular tiempo de carga (reemplaza esto con tu lógica de autenticación real)
+        setTimeout(() => {
+            usuarioActual = {
+                username: usuario.username,
+                role: usuario.role,
+                nombre: usuario.nombre
+            };
+
+            // Guardar sesión en localStorage (si lo usas)
+            localStorage.setItem("sesionActual", JSON.stringify(usuarioActual));
+
+            // Eliminar overlay de carga
+            loadingOverlay.remove();
+
+            // Mostrar la aplicación principal
+            mostrarAplicacion();
+        }, 1500); // 1.5 segundos de carga (ajusta según sea necesario)
+    } else {
+        errorElement.textContent = "Usuario o contraseña incorrectos";
+        // Animación de error (opcional)
+        errorElement.style.animation = "none";
+        setTimeout(() => {
+            errorElement.style.animation = "shake 0.5s";
+        }, 10);
+    }
+}
     </script>
 </body>
 </html>
